@@ -1,28 +1,21 @@
 name: Build
 on:
- push:
-   branches:
-     - main
- pull_request:
-   types: [opened, synchronize, reopened, closed]
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths: 
+      - "hooks/**"
 jobs:
- sonarcloud:
-   if: startsWith(github.head_ref, 'FE_') && github.event.pull_request.merged == false
-   name: SonarCloud
-   runs-on: ubuntu-latest
-   defaults:
-     run:
-       working-directory: ./hooks
-   steps:
-     - uses: actions/checkout@v2
-       with:
-         fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-     - name: Install Dependencies
-       run: npm install --legacy-peer-deps
-     - name: SonarCloud Scan
-       with:
-         projectBaseDir: ./hooks
-       uses: SonarSource/sonarcloud-github-action@master
-       env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  sonarqube:
+    name: SonarQube
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        with: 
+          projectBaseDir: ./hooks
+        uses: SonarSource/sonarqube-scan-action@v5
